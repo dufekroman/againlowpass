@@ -17,7 +17,7 @@ public:
 	//---from VSTGUIEditor---------------
 	bool PLUGIN_API open(void* parent);
 	void PLUGIN_API close();
-	//CMessageResult notify(CBaseObject* sender, const char* message); TODO
+	CMessageResult notify(CBaseObject* sender, const char* message);
 	void beginEdit(long /*index*/) {}
 	void endEdit(long /*index*/) {}
 

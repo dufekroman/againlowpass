@@ -359,17 +359,18 @@ tresult PLUGIN_API AGainLowPassEditorView::queryInterface(const char* iid, void*
 	return VSTGUIEditor::queryInterface(iid, obj);
 }
 
-//void AGainLowPassEditorView::messageTextChanged()
-//{
-//	AGainLowPassController* controller = dynamic_cast<AGainLowPassController*> (getController());
-//	if (controller)
-//	{
-//		String text(controller->getDefaultMessageText());
-//		char8 asciiText[128];
-//		text.copyTo8(asciiText, 0, 127);
-//		textEdit->setText(asciiText);
-//	}
-//}
+CMessageResult AGainLowPassEditorView::notify(CBaseObject* sender, const char* message)
+{
+	if (message == CVSTGUITimer::kMsgTimer)
+	{
+		if (vuMeter)
+		{
+			vuMeter->setValue(1.f - ((lastVuMeterValue - 1.f) * (lastVuMeterValue - 1.f)));
+			lastVuMeterValue = 0.f;
+		}
+	}
+	return VSTGUIEditor::notify(sender, message);
+}
 
 } // namespace Steinberg
 } // namespace Vst

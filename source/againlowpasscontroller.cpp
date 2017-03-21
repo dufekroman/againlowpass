@@ -155,7 +155,7 @@ tresult PLUGIN_API AGainLowPassController::initialize(FUnknown* context)
 	gainParam->setUnitID(1);
 
 	//---Cutoff parameter--
-	CutoffParameter* cutoffParam = new CutoffParameter(ParameterInfo::kCanAutomate, kGainId);
+	CutoffParameter* cutoffParam = new CutoffParameter(ParameterInfo::kCanAutomate, kCutOffId);
 	parameters.addParameter(cutoffParam);
 	cutoffParam->setUnitID(1);
 	
