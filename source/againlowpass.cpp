@@ -20,7 +20,7 @@ AGainLowPass::AGainLowPass() :
 	currentProcessMode(-1), // -1 means not initialized
 	bHalfGain(false),
 	bBypass(false),
-	iCutoff(200),
+	fCutoff(0.f),
 	tmp0 (0.f),
 	tmp1(0.f)
 {
@@ -85,8 +85,8 @@ tresult PLUGIN_API AGainLowPass::setState(IBStream* state)
 		return kResultFalse;
 	}
 
-	uint32 savedCutoff = 0;
-	if (state->read(&savedCutoff, sizeof(uint32)) != kResultOk)
+	float savedCutoff = 0.f;
+	if (state->read(&savedCutoff, sizeof(float)) != kResultOk)
 	{
 		return kResultFalse;
 	}
@@ -101,7 +101,7 @@ tresult PLUGIN_API AGainLowPass::setState(IBStream* state)
 	fGain = savedGain;
 	fGainReduction = savedGainReduction;
 	bBypass = savedBypass > 0;
-	iCutoff = savedCutoff;
+	fCutoff = savedCutoff;
 	
 
 	return kResultOk;
@@ -114,7 +114,7 @@ tresult PLUGIN_API AGainLowPass::getState(IBStream* state)
 	float toSaveGain = fGain;
 	float toSaveGainReduction = fGainReduction;
 	int32 toSaveBypass = bBypass ? 1 : 0;
-	uint32 toSaveCutoff = iCutoff;
+	float toSaveCutoff = fCutoff;
 
 #if BYTEORDER == kBigEndian
 	SWAP_32(toSaveGain)
@@ -126,7 +126,7 @@ tresult PLUGIN_API AGainLowPass::getState(IBStream* state)
 		state->write(&toSaveGain, sizeof(float));
 	state->write(&toSaveGainReduction, sizeof(float));
 	state->write(&toSaveBypass, sizeof(int32));
-	state->write(&toSaveCutoff, sizeof(uint32));
+	state->write(&toSaveCutoff, sizeof(float));
 	return kResultOk;
 }
 
@@ -239,6 +239,13 @@ tresult PLUGIN_API AGainLowPass::process(ProcessData& data)
 						fGain = (float)value;
 					}
 					break;
+				case kCutOffId:
+					if (paramQueue->getPoint(numPoints - 1, sampleOffset, value) == kResultTrue)
+					{
+						fCutoff = (float)value;
+					}
+					break;
+
 
 				case kBypassId:
 					if (paramQueue->getPoint(numPoints - 1, sampleOffset, value) == kResultTrue)
@@ -329,16 +336,17 @@ tresult PLUGIN_API AGainLowPass::process(ProcessData& data)
 			float* ptrOut1 = (float*)out[0];
 			float* ptrIn2 = (float*)in[1];
 			float* ptrOut2 = (float*)out[1];
-			float x = exp(-2.0 * M_PI * iCutoff / 44100);
+			float plainCutoff = (5000.f - 200.f) * fCutoff + 200.f;
+			float x = exp(-2.0 * M_PI * plainCutoff / 44100);
 			float a0 = 1.0 - x;
 			float b1 = -x;
 
 			while (--sampleFrames >= 0)
 			{
-				tmp0 = (a0*(*ptrIn1++) - b1*tmp0) ;
+				tmp0 = (a0*(*ptrIn1++) - b1*tmp0) * gain;
 				(*ptrOut1++) = tmp0;
 
-				tmp1 = (a0*(*ptrIn2++) - b1*tmp1);
+				tmp1 = (a0*(*ptrIn2++) - b1*tmp1) * gain;
 				(*ptrOut2++) = tmp1;
 
 				if (tmp1 > fVuPPM)

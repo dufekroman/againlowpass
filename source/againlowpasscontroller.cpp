@@ -42,7 +42,7 @@ void GainParameter1::toString(ParamValue normValue, String128 string) const
 	char text[32];
 	if (normValue > 0.0001)
 	{
-		sprintf(text, "%.2f", 20 * log10f((float)normValue));
+		sprintf(text, "%.2f dB", 20 * log10f((float)normValue));
 	}
 	else
 	{
@@ -70,15 +70,14 @@ bool GainParameter1::fromString(const TChar* string, ParamValue& normValue) cons
 	return false;
 }
 
-//cutoff frekvence je celociselna, ale CHorizontalSlider pocita s float vnitrni reprezentaci, takze to bude sranda
-
-class CutoffParameter : public Parameter
+class CutoffParameter : public RangeParameter
 {
 public:
 	CutoffParameter(int32 flags, int32 id);
 
 	virtual void toString(ParamValue normValue, String128 string) const;
 	virtual bool fromString(const TChar* string, ParamValue& normValue) const;
+	//static uint32 fromNorm(float _norm);
 };
 
 CutoffParameter::CutoffParameter(int32 flags, int32 id)
@@ -86,27 +85,22 @@ CutoffParameter::CutoffParameter(int32 flags, int32 id)
 	Steinberg::UString(info.title, USTRINGSIZE(info.title)).assign(USTRING("Cutoff"));
 	Steinberg::UString(info.units, USTRINGSIZE(info.units)).assign(USTRING("Hz"));
 
+	setMin(200);
+	setMax(5000);
 	info.flags = flags;
 	info.id = id;
 	info.stepCount = 0;
-	info.defaultNormalizedValue = 200;
+	info.defaultNormalizedValue = 0.f;
 	info.unitId = kRootUnitId;
 
-	setNormalized(200);
+	this->setNormalized(0.f);
 }
 
 void CutoffParameter::toString(ParamValue normValue, String128 string) const
 {
 	char text[32];
-	if (normValue > 0)
-	{
-		sprintf(text, "%u", ((uint32)normValue));
-	}
-	else
-	{
-		strcpy(text, "0");
-	}
-
+	//sprintf(text, "%u Hz", (CutoffParameter::fromNorm(normValue)));
+	sprintf(text, "%u Hz", ((uint32)toPlain(normValue)));
 	Steinberg::UString(string, 128).fromAscii(text);
 }
 
@@ -116,13 +110,15 @@ bool CutoffParameter::fromString(const TChar* string, ParamValue& normValue) con
 	uint32 tmp = 0;
 	if (wrapper.scanUInt32(tmp))
 	{
-
-
-		normValue = (float)tmp;
+		normValue = (float)toNormalized(tmp);
 		return true;
 	}
 	return false;
 }
+
+/*uint32 CutoffParameter::fromNorm(float _norm) {
+	return (5000 - 200) * _norm + 200;
+}*/
 
 tresult PLUGIN_API AGainLowPassController::initialize(FUnknown* context)
 {
@@ -217,8 +213,8 @@ tresult PLUGIN_API AGainLowPassController::setComponentState(IBStream* state) //
 
 
 
-		uint32 savedCutoff = 200;
-		if (state->read(&savedCutoff, sizeof(uint32)) != kResultOk)
+		float savedCutoff = 0.f;
+		if (state->read(&savedCutoff, sizeof(float)) != kResultOk)
 		{
 			return kResultFalse;
 		}

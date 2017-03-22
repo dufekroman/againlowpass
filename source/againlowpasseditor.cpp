@@ -39,7 +39,7 @@ AGainLowPassEditorView::AGainLowPassEditorView(void * controller) :
 //
 bool AGainLowPassEditorView::open(void* parent)
 {
-	if (frame) // already attached!
+	if (frame) // already attached!                         
 	{
 		return false;
 	}
@@ -52,12 +52,12 @@ bool AGainLowPassEditorView::open(void* parent)
 	background = new CBitmap("background.png");
 	frame->setBackground(background);
 
-	CRect size(0, 0, 30, 18);
+	CRect size(0, 0, 50, 18);
 
 	//---Cutoff Label--------
 
 	size.offset(10, 10);
-	CTextLabel* labelCutoff = new CTextLabel(size, "COF", 0, kShadowText);
+	CTextLabel* labelCutoff = new CTextLabel(size, "Cutoff", 0, kShadowText);
 	frame->addView(labelCutoff);
 
 	//---Cutoff slider-------
@@ -65,7 +65,7 @@ bool AGainLowPassEditorView::open(void* parent)
 	CBitmap* backgroundSliderCutoff = new CBitmap("slider_background.bmp");
 
 	size(0, 0, 130, 18);
-	size.offset(45, 10);
+	size.offset(60, 10);
 	CPoint offsetCutoff;
 	CPoint offsetHandleCutoff(0, 2);
 	cutoffSlider = new CHorizontalSlider(size, this, 'CutO', offsetHandleCutoff, size.getWidth(), handleCutoff, backgroundSliderCutoff, offsetCutoff, kLeft);
@@ -74,8 +74,8 @@ bool AGainLowPassEditorView::open(void* parent)
 	backgroundSliderCutoff->forget();
 
 	//---Cutoff Textedit--------
-	size(0, 0, 40, 18);
-	size.offset(50 + cutoffSlider->getWidth(), 10);
+	size(0, 0, 60, 18);
+	size.offset(70 + cutoffSlider->getWidth(), 10);
 	cutoffTextEdit = new CTextEdit(size, this, 'CutT', "", 0, k3DIn);
 	cutoffTextEdit->setFont(kNormalFontSmall);
 	frame->addView(cutoffTextEdit);
@@ -84,7 +84,7 @@ bool AGainLowPassEditorView::open(void* parent)
 
 	//---Gain Label--------
 	
-	size(0, 0, 30, 18);
+	size(0, 0, 50, 18);
 	size.offset(10, 40);
 	CTextLabel* label = new CTextLabel(size, "Gain", 0, kShadowText);
 	frame->addView(label);
@@ -94,7 +94,7 @@ bool AGainLowPassEditorView::open(void* parent)
 	CBitmap* backgroundSlider = new CBitmap("slider_background.bmp");
 
 	size(0, 0, 130, 18);
-	size.offset(45, 40);
+	size.offset(60, 40);
 	CPoint offset;
 	CPoint offsetHandle(0, 2);
 	gainSlider = new CHorizontalSlider(size, this, 'Gain', offsetHandle, size.getWidth(), handle, backgroundSlider, offset, kLeft);
@@ -103,8 +103,8 @@ bool AGainLowPassEditorView::open(void* parent)
 	backgroundSlider->forget();
 
 	//---Gain Textedit--------
-	size(0, 0, 40, 18);
-	size.offset(50 + gainSlider->getWidth(), 40);
+	size(0, 0, 60, 18);
+	size.offset(70 + gainSlider->getWidth(), 40);
 	gainTextEdit = new CTextEdit(size, this, 'GaiT', "", 0, k3DIn);
 	gainTextEdit->setFont(kNormalFontSmall);
 	frame->addView(gainTextEdit);
@@ -274,26 +274,25 @@ tresult PLUGIN_API AGainLowPassEditorView::checkSizeConstraint(ViewRect* rect)
 
 tresult PLUGIN_API AGainLowPassEditorView::findParameter(int32 xPos, int32 yPos, ParamID& resultTag) {
 	CPoint where(xPos, yPos);
-	// test wether xPos/yPos is inside the gainSlider.
-	if (gainSlider->hitTest(where, 0))
+	if (gainSlider->hitTest(where, kGainId))
 	{
 		resultTag = kGainId;
 		return kResultOk;
 	}
 
-	if (gainTextEdit->hitTest(where, 0))
+	if (gainTextEdit->hitTest(where, kGainId))
 	{
 		resultTag = kGainId;
 		return kResultOk;
 	}
 
-	if (cutoffSlider->hitTest(where, 3))
+	if (cutoffSlider->hitTest(where, kCutOffId))
 	{
 		resultTag = kCutOffId;
 		return kResultOk;
 	}
 
-	if (cutoffTextEdit->hitTest(where, 3))
+	if (cutoffTextEdit->hitTest(where, kCutOffId))
 	{
 		resultTag = kCutOffId;
 		return kResultOk;
@@ -355,7 +354,6 @@ void AGainLowPassEditorView::update(ParamID tag, ParamValue value)
 tresult PLUGIN_API AGainLowPassEditorView::queryInterface(const char* iid, void** obj)
 {
 	QUERY_INTERFACE(iid, obj, IParameterFinder::iid, IParameterFinder)
-	//QUERY_INTERFACE(iid, obj, IContextMenuTarget::iid, IContextMenuTarget)
 	return VSTGUIEditor::queryInterface(iid, obj);
 }
 

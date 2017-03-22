@@ -47,7 +47,7 @@ protected:
 	SampleType processAudio(SampleType** input, SampleType** output, int32 numChannels, int32 sampleFrames, float gain);*/
 
 
-	uint32 iCutoff;
+	float fCutoff;
 
 	float fGain;
 	float fGainReduction;

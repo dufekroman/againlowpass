@@ -1,5 +1,6 @@
-﻿  againlowpasscontroller.cpp
-  againlowpasseditor.cpp
+﻿  againcontroller.cpp
+  againlowpass.cpp
+  againlowpasscontroller.cpp
 C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1189,5): warning MSB8012: TargetPath(C:\Users\Roman\Downloads\vstsdk366_27_06_2016_build_61\VST3 SDK\public.sdk\samples\vst\again\win\Win32\Debug\AGain.vst3) does not match the Linker's OutputFile property value (C:\Program Files (x86)\Common Files\VST3\Steinberg\AGain.vst3). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
   again.vcxproj -> C:\Users\Roman\Downloads\vstsdk366_27_06_2016_build_61\VST3 SDK\public.sdk\samples\vst\again\win\Win32\Debug\AGain.vst3
   again.vcxproj -> Win32\Debug\again.pdb (Full PDB)
