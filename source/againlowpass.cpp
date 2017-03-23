@@ -43,7 +43,7 @@ tresult PLUGIN_API AGainLowPass::initialize(FUnknown* context)
 	addAudioOutput(STR16("Stereo Out"), SpeakerArr::kStereo);
 
 	//---create Event In/Out buses (1 bus with only 1 channel)------
-	addEventInput(STR16("Event In"), 1);
+	//addEventInput(STR16("Event In"), 1);
 
 	return kResultOk;
 }
@@ -199,6 +199,7 @@ tresult PLUGIN_API AGainLowPass::canProcessSampleSize(int32 symbolicSampleSize)
 
 	// we support double processing
 	if (symbolicSampleSize == kSample64)
+		return kResultFalse;
 		return kResultTrue;
 
 	return kResultFalse;
